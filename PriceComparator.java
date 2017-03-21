@@ -32,12 +32,7 @@ public class PriceComparator implements java.util.Comparator<TradeOrder>
      */
     public int compare( TradeOrder order1, TradeOrder order2 )
     {
-        if (order1.isMarket() && order2.isMarket())
-        {
-            return 0;
-        }
-        
-        else if (order1.isMarket() && order2.isLimit())
+        if (order1.isMarket() && order2.isLimit())
         {
             return -1;
         }
@@ -64,5 +59,7 @@ public class PriceComparator implements java.util.Comparator<TradeOrder>
                 return c;
             }
         }
+        
+        return 0;
     }
 }
