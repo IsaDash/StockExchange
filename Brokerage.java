@@ -38,7 +38,7 @@ public class Brokerage implements Login
         }
         else
         {
-            Trader trader = new Trader( exchange, name, password );
+            Trader trader = new Trader( this, name, password );
             traders.put( name, trader );
             return 0;
         }
@@ -62,9 +62,13 @@ public class Brokerage implements Login
         }
         else
         {
-            openWindow();
-            myWindow.show("Welcome to SafeTrade!");
-            Trader trader = new Trader(exchange, name, password);
+            Trader trader = new Trader(this, name, password);
+            trader.openWindow();
+            if(! trader.hasMessages())
+            {
+                trader.receiveMessage( "Welcome to SafeTrade!" );
+            }
+                       
             loggedTraders.add( trader );
             return 0;
         }
