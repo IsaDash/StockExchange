@@ -19,12 +19,12 @@ import junit.framework.JUnit4TestAdapter;
  *   Stock
  *
  * @author Selena Huang
- * @author TODO Name of group member
- * @author TODO Name of group member
- * @version TODO date
+ * @author Isa Dash
+ * @author Eric Fu
+ * @version March 21, 2017
  * @author Assignment: JM Chapter 19 - SafeTrade
  * 
- * @author Sources: TODO sources
+ * @author Sources: http://junit.org/junit4/javadoc/latest/
  *
  */
 public class JUSafeTradeTest
@@ -161,7 +161,7 @@ public class JUSafeTradeTest
             - numToSubtract, to.getShares() );
     }
     
-    // --Test TraderWindow Stub
+/*    // --Test TraderWindow Stub
     @Test
     public void traderWindowConstructor()
     {
@@ -175,7 +175,7 @@ public class JUSafeTradeTest
         TraderWindow tw = new TraderWindow( null );
         assertNotNull( tw );
         tw.showMessage( null );
-    }
+    }*/
 
     //  --Test PriceComparator
     
@@ -189,21 +189,37 @@ public class JUSafeTradeTest
      */
     private String screenname = "asdfghjkl";
     private String password = "1234asdf";
+    private Brokerage brokerage = null;
+    private Trader trader1 = new Trader (null, "ASDFGHJKL", "password");
+    private Trader trader2 = new Trader (null, "AHJKL", "pasword");
 
     @Test
     public void traderConstructor()
     {
-        Brokerage brokerage = null;
         Trader trade = new Trader( brokerage, screenname, password);
         String toStr = trade.toString();
-        System.out.println(toStr);
+        System.out.print( toStr );
+        System.out.println();
         assertTrue( "<< Invalid Trader Constructor >>",
                     toStr.contains( "Trader[Brokerage brokerage:null" )
                         && toStr.contains( "java.lang.String screenname:" + screenname )
                         && toStr.contains( "java.lang.String password:" + password ));
     }
     
+    @Test
+    public void traderToString()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        assertNotNull(trade.toString());
+    }
     
+    @Test
+    public void traderCompareTo()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        assertEquals(0, trade.compareTo( trader1 ));
+        assertNotEquals(0 , trade.compareTo( trader2 ));
+    }
     
     // --Test Brokerage
     
