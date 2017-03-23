@@ -190,7 +190,7 @@ public class JUSafeTradeTest
     private String screenname = "asdfghjkl";
     private String password = "1234asdf";
     private Brokerage brokerage = null;
-    private Trader trader1 = new Trader (null, "ASDFGHJKL", "password");
+    private Trader trader1 = new Trader (null, screenname, "password");
     private Trader trader2 = new Trader (null, "AHJKL", "pasword");
 
     @Test
@@ -201,9 +201,11 @@ public class JUSafeTradeTest
         System.out.print( toStr );
         System.out.println();
         assertTrue( "<< Invalid Trader Constructor >>",
-                    toStr.contains( "Trader[Brokerage brokerage:null" )
-                        && toStr.contains( "java.lang.String screenname:" + screenname )
-                        && toStr.contains( "java.lang.String password:" + password ));
+                    toStr.contains( "Trader[Brokerage brokerage" )
+                        && toStr.contains( "java.lang.String screenName:" + screenname )
+                        && toStr.contains( "java.lang.String password:" + password )
+                        && toStr.contains( "TraderWindow myWindow:null" )
+                        && toStr.contains( "java.util.Queue mailbox:[]" ));
     }
     
     @Test
@@ -217,9 +219,61 @@ public class JUSafeTradeTest
     public void traderCompareTo()
     {
         Trader trade = new Trader( brokerage, screenname, password);
-        assertEquals(0, trade.compareTo( trader1 ));
-        assertNotEquals(0 , trade.compareTo( trader2 ));
+        assertEquals("<<Trader: compareto trader1 should equal trader>>", 0, trade.compareTo( trader1 ));
+        assertNotEquals("<<Trader: compareto trader2 should not equal trader>>", 
+            0, trade.compareTo( trader2 ));
     }
+    
+    @Test
+    public void traderEquals()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        assertTrue("<<Trader: " + trade.getName().toLowerCase() + " should equal " 
+            + trader1.getName().toLowerCase() + ">>", trade.equals( trader1 ));
+        assertFalse("<<Trader: " + trade.getName().toLowerCase() + " should not equal " + 
+            trader2.getName().toLowerCase() + ">>", trade.equals( trader2 ));
+    }
+    
+    @Test
+    public void traderGetName()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        assertEquals("Trader: " + trade.getName() + " should equal " + screenname + ">>",
+            trade.getName(), screenname);
+    }
+    
+    @Test
+    public void traderGetPassword()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        assertEquals("Trader: " + trade.getPassword() + " should equal " + password + ">>",
+            trade.getPassword(), password);
+    }
+    
+    @Test
+    public void traderHasMessages()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        assertFalse("Trader: " + trade.hasMessages() + " should be false>>",
+            trade.hasMessages());
+        trade.receiveMessage( "message" );
+        assertTrue("Trader: " + trade.hasMessages() + " should be true>>",
+            trade.hasMessages());
+    }
+    
+    @Test
+    public void traderOpenWindow()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        trade.receiveMessage( "message" );
+        trade.openWindow();
+        assertFalse("Trader: " + trade.hasMessages() + " should be false>>",
+            trade.hasMessages());
+    }
+    
+    
+    
+    
     
     // --Test Brokerage
     
