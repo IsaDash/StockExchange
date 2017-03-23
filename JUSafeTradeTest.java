@@ -271,7 +271,26 @@ public class JUSafeTradeTest
             trade.hasMessages());
     }
     
+    @Test
+    public void traderGetQuote()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        //TODO after brokerage
+    }
     
+    @Test
+    public void traderPlaceOrder()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        //TODO after brokerage
+    }
+    
+    @Test
+    public void traderQuit()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        //TODO after brokerage
+    }
     
     
     
