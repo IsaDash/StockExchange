@@ -179,9 +179,99 @@ public class JUSafeTradeTest
 
     //  --Test PriceComparator
     
-    // TODO your tests here
+    @Test
+    public void priceComparatorConstructor()
+    {
+        PriceComparator pc = new PriceComparator();
+        assertNotNull( "Default PriceComparator constructor failed", pc );
+        
+        pc = new PriceComparator (false);
+        assertNotNull( "PriceComparator constructor failed", pc );
+    }
     
+    @Test
+    public void priceComparatorCompareMarketMarket()
+    {
+        String symbol = "SYMB";
+        boolean buy = true;
+        boolean market = true;
+        int shares = 10;
+        TradeOrder order1 = new TradeOrder( null, symbol, buy, market, shares, 
+                                             12.50 );
+        TradeOrder order2 = new TradeOrder( null, symbol, !buy, market, shares+10, 
+                                             32.50 );
+        
+        PriceComparator pc = new PriceComparator();
+        
+        assertEquals("PriceComparator: expected 0 when comparing 2 market order", 
+                     0, pc.compare(order1, order2));
+    }
     
+    @Test
+    public void priceComparatorCompareMarketLimit()
+    {
+        String symbol = "SYMB";
+        boolean buy = true;
+        boolean market = true;
+        int shares = 10;
+        TradeOrder order1 = new TradeOrder( null, symbol, buy, market, shares, 
+                                             12.50 );
+        TradeOrder order2 = new TradeOrder( null, symbol, !buy, !market, shares+10, 
+                                             32.50 );
+        
+        PriceComparator pc = new PriceComparator();
+        
+        assertEquals("PriceComparator: expected " + 
+                     "-1 when comparing market order with limit order", 
+                     -1, pc.compare(order1, order2));
+    }
+    
+    @Test
+    public void priceComparatorCompareLimitMarket()
+    {
+        String symbol = "SYMB";
+        boolean buy = true;
+        boolean market = true;
+        int shares = 10;
+        TradeOrder order1 = new TradeOrder( null, symbol, buy, !market, shares, 
+                                             12.50 );
+        TradeOrder order2 = new TradeOrder( null, symbol, !buy, market, shares+10, 
+                                             32.50 );
+        
+        PriceComparator pc = new PriceComparator();
+        
+        assertEquals("PriceComparator: expected " + 
+                     "1 when comparing limit order with market order", 
+                     1, pc.compare(order1, order2));
+    }
+    
+    @Test
+    public void priceComparatorCompareLimitLimit()
+    {
+        String symbol = "SYMB";
+        boolean buy = true;
+        boolean market = true;
+        int shares = 10;
+        int diffCents = 55;
+        TradeOrder order1 = new TradeOrder( null, symbol, buy, !market, shares, 
+                                             12.50 );
+        TradeOrder order2 = new TradeOrder( null, symbol, !buy, !market, shares+10, 
+                                             order1.getPrice() + diffCents/100.0);
+        
+        PriceComparator pcAsc = new PriceComparator();
+        
+        assertEquals("PriceComparator: expected " + (-diffCents) +
+                     " cents when comparing these 2 limit orders", 
+                     -diffCents, pcAsc.compare(order1, order2));
+        
+        PriceComparator pcDesc = new PriceComparator(false);
+        
+        assertEquals("PriceComparator: expected " + diffCents +
+                     " cents when comparing these 2 limit orders", 
+                     diffCents, pcDesc.compare(order1, order2));
+
+    }
+     
     // --Test Trader
     /**
      * Trader tests:
@@ -515,8 +605,121 @@ public class JUSafeTradeTest
     
     // --Test Stock
     
-    // TODO your tests here
-
+    @Test
+    public void stockConstructor()
+    {
+        String symbol = "SYMB";
+        String companyName ="Lynbrook Inc.";
+        double price = 135.75;
+        Stock s = new Stock(symbol, companyName, price);
+        
+        assertNotNull( "Stock constructor failed", s);
+    }
+    
+    @Test
+    public void stockGetQuote()
+    {
+        String symbol = "SYMB";
+        String companyName ="Lynbrook Inc.";
+        double price = 135.75;
+        Stock stock = new Stock(symbol, companyName, price);
+        
+        String quote = stock.getQuote();
+        
+        assertTrue("Stock quote contains invalid information",
+                   quote.contains(symbol) && 
+                   quote.contains(companyName) &&
+                   quote.contains("" + price) );
+    }
+    
+    @Test
+    public void stockPlaceOrder()
+    {
+        String symbol = "SYMB";
+        String companyName ="Lynbrook Inc.";
+        double price = 135.75;
+        double bidPrice = price + 1;
+        Stock stock = new Stock(symbol, companyName, price);
+        
+        Trader trader1 = new Trader(null, "Lynb", "Viking");
+        
+        boolean buy = true;
+        boolean market = true;
+        int shares = 10;
+        TradeOrder order1 = new TradeOrder(trader1, symbol, buy, market, shares, 
+                                           bidPrice );
+        try
+        {
+            stock.placeOrder(order1);
+            
+            String quote = stock.getQuote();      
+            assertTrue("Stock quote contains invalid transaction information",
+                       quote.contains("Bid: " + bidPrice +  " size: " + shares));
+            //The above string concatenation needs match output of stock.getQuote()
+        }
+        catch (Exception e)
+        {
+            assertTrue("Failed to place an order", false);
+        }
+        
+        assertTrue("Trader should have received message after placing an order",
+                   trader1.hasMessages());
+    }
+    
+    @Test
+    public void stockExecuteOrders()
+    {
+        String symbol = "SYMB";
+        String companyName ="Lynbrook Inc.";
+        double price = 135.75;
+        double bidPrice = price + 1;
+        Stock stock = new Stock(symbol, companyName, price);
+        
+        Trader trader1 = new Trader(null, "Lynb", "Viking");
+        Trader trader2 = new Trader(null, "Hyde", "Hi");
+        
+        boolean buy = true;
+        boolean market = true;
+        int shares = 10;
+        TradeOrder order1 = new TradeOrder(trader1, symbol, buy, market, shares, 
+                                           bidPrice );
+        TradeOrder order2 = new TradeOrder(trader2, symbol, !buy, market, shares, 
+                                           price);
+        String quote;
+        
+        try
+        {
+            stock.placeOrder(order1); 
+            
+            quote = stock.getQuote();      
+            assertTrue("Stock quote contains invalid transaction information",
+                       quote.contains("Bid: " + bidPrice +  " size: " + shares));
+            //The above string concatenation needs match output of stock.getQuote()
+            
+            stock.placeOrder(order2); 
+            
+            stock.executeOrders();
+        }
+        catch (Exception e)
+        {
+            assertTrue("Failed to place or execute orders", false);
+        }
+        
+        assertTrue("Trader should have received message after placing an order",
+                   trader1.hasMessages());
+        
+        assertTrue("Trader should have received message after placing an order",
+                   trader2.hasMessages());
+        
+        quote = stock.getQuote();      
+        //System.out.println(quote);
+        
+        assertTrue("Stock quote contains invalid transaction information",
+                   quote.contains(symbol) && 
+                   quote.contains(companyName) &&
+                   quote.contains("Price: " +  price) &&
+                   quote.contains(" vol: " + shares));
+    }
     
     // Remove block comment below to run JUnit test in console
 /*
