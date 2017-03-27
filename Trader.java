@@ -12,7 +12,7 @@ public class Trader implements Comparable<Trader>
     private Queue<String> mailbox;
 
     /**
-     * Constructs a new trader, affiliated with a given brockerage, with a given screen name and password. 
+     * Constructs a new trader, affiliated with a given brokerage, with a given screen name and password. 
      * @param broker  the brokerage for this trader.
      * @param name is username
      * @param pswd is password
