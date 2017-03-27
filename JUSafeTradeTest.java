@@ -296,12 +296,221 @@ public class JUSafeTradeTest
     
     // --Test Brokerage
     
-    // TODO your tests here
-    
+    @Test
+    public void brokerageConstructor()
+
+    {
+
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage b = new Brokerage( exchange );
+        String str = b.toString();
+
+        assertTrue( "<< Invalid Brokerage Constructor >>",
+            str.contains( "Brokerage[" ) );
+
+    }
+
+
+    @Test
+    public void brokerageToString()
+
+    {
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage b = new Brokerage( exchange );
+        assertNotNull( b.toString() );
+
+    }
+
+
+    @Test
+    public void brokerageAddUser()
+
+    {
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage brokerage = new Brokerage( exchange );
+        assertTrue( "<< Invalid name >>",
+            brokerage.addUser( "name", "password" ) == -1 );
+        assertTrue( "<< Invalid name >>",
+            brokerage.addUser( "name", "password" ) == -1 );
+        assertTrue( "<< Invalid name >>",
+            brokerage.addUser( "username", "name" ) == -2 );
+        assertTrue( "<< Invalid name >>",
+            brokerage.addUser( "username", "traderUsers" ) == -2 );
+        assertTrue( "<< Invalid name >>",
+            brokerage.addUser( "username", "pswd" ) == 0
+                && brokerage.getTraders().containsKey( "username" ) );
+        assertTrue( "<< invalid name >>",
+            brokerage.addUser( "username", "pswd1" ) == -3 );
+
+    }
+
+
+    @Test
+    public void brokerageGetQuote()
+
+    {
+
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage brokerage = new Brokerage( exchange );
+        Trader trader = new Trader( brokerage, screenname, password );
+
+        brokerage.getQuote( symbol, trader );
+        assertTrue( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
+
+    }
+
+
+    @Test
+    public void brokerageLogin()
+
+    {
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage brokerage = new Brokerage( exchange );
+
+        String n = "java";
+        String p = "trader";
+        brokerage.addUser( n, p );
+        assertTrue( "<< Invalid brokerage login >>",
+            brokerage.login( "user", p ) == -1 );
+        assertTrue( "<< Invalid brokerage login >>",
+            brokerage.login( n, "Invalid" ) == -2 );
+        assertTrue( "<< Invalid brokerage login >>",
+            brokerage.login( n, p ) == 0
+                && brokerage.getLoggedTraders()
+                    .contains( brokerage.getTraders().get( n ) )
+                && !brokerage.getTraders().get( n ).hasMessages() );
+
+        brokerage.login( n, p );
+
+        assertTrue( "<< invalid brokerage login >>",
+            brokerage.login( n, p ) == -3 );
+
+    }
+
+
+    @Test
+    public void brokerageLogout()
+
+    {
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage brokerage = new Brokerage( exchange );
+
+        brokerage.addUser( "java", "user" );
+        brokerage.login( "java", "user" );
+        brokerage.logout( brokerage.getTraders().get( "java" ) );
+        assertFalse( "<< Invalid brokerage logout >>", brokerage.getLoggedTraders()
+            .contains( brokerage.getTraders().get( "java" ) ) );
+
+    }
+
+
+    @Test
+    public void brokeragePlaceOrder()
+
+    {
+        StockExchange exchange = new StockExchange();
+        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
+        Brokerage brokerage = new Brokerage( exchange );
+        Trader trader = new Trader( brokerage, screenname, password );
+
+        TradeOrder order = new TradeOrder( trader,
+            symbol,
+            true,
+            false,
+            10,
+            10.0 );
+        brokerage.placeOrder( order );
+        assertTrue( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
+        trader.openWindow();
+        brokerage.placeOrder( order );
+        assertFalse( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
+
+    }
     
     // --Test StockExchange
     
-    // TODO your tests here
+    @Test
+    public void stockExchangeConstructor()
+
+    {
+        StockExchange se = new StockExchange();
+        String toStr = se.toString();
+        assertTrue( "<< Invalid StockExchange Constructor >>",
+            toStr.contains( "StockExchange[" ) );
+
+    }
+
+
+    @Test
+    public void stockExchangeToString()
+
+    {
+        StockExchange se = new StockExchange();
+        assertNotNull( se.toString() );
+
+    }
+
+
+    @Test
+    public void stockExchangeListStock()
+
+    {
+        StockExchange se = new StockExchange();
+        se.listStock( "GGGL", "Giggle.com", 10.0 );
+        Map<String, Stock> listedStocks = se.getListedStocks();
+        assertTrue( "<< Invalid StockExchange listStock >>",
+            listedStocks.containsKey( "GGGL" ) );
+
+    }
+
+
+    @Test
+    public void stockExchangeGetQuote()
+
+    {
+        StockExchange se = new StockExchange();
+        se.listStock( "GGGL", "Giggle.com", 10.0 );
+
+        String quote = se.getQuote( "GGGL" );
+        assertTrue( "<< Invalid StockExchange getQuote >>",
+        quote != null );
+
+    }
+
+
+    @Test
+    public void stockExchangePlaceOrder()
+
+    {
+
+        StockExchange to = new StockExchange();
+        Brokerage safeTrade = new Brokerage( to );
+        safeTrade.addUser( "stockman", "sesame" );
+        Trader trade = new Trader( safeTrade, "stockman", "sesame" );
+
+        TradeOrder order = new TradeOrder( trade,
+        symbol,
+        buyOrder,
+        marketOrder,
+        numShares,
+        price );
+
+        to.listStock( "GGGL", "Giggle.com", 10.00 );
+        to.placeOrder( order );
+        assertTrue( "<< Invalid StockExchange placeOrder >>",
+            trade.hasMessages() );
+        trade.openWindow();
+        to.placeOrder( order );
+        assertFalse( "<< Invalid StockExchange placeOrder >>",
+            trade.hasMessages() );
+
+    }
     
     
     // --Test Stock
