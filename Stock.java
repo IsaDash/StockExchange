@@ -43,64 +43,64 @@ public class Stock
     {
         while ( true )
         {
-            TradeOrder topBuy = buyOrders.peek();
-            TradeOrder topSell = sellOrders.peek();
+            TradeOrder buy = buyOrders.peek();
+            TradeOrder sell = sellOrders.peek();
             double price = 0;
             int shares = 0;
             
-            if ( topBuy == null || topSell == null )
+            if ( buy == null || sell == null )
             {
                 break;
             }
             
-            if ( topBuy.isLimit() && topSell.isLimit()
-                            && topBuy.getPrice() > topSell.getPrice() )
+            if ( buy.isLimit() && sell.isLimit()
+                            && buy.getPrice() > sell.getPrice() )
             {
                 break;
             }
             
-            if ( topBuy.isLimit() && topSell.isLimit()
-                && topBuy.getPrice() <= topSell.getPrice() )
+            if ( buy.isLimit() && sell.isLimit()
+                && buy.getPrice() <= sell.getPrice() )
             {
-                price = topSell.getPrice();
+                price = sell.getPrice();
             }
             
-            else if ( topBuy.isLimit() && topSell.isMarket()
-                            || topBuy.isMarket() && topSell.isLimit() )
+            else if ( buy.isLimit() && sell.isMarket()
+                            || buy.isMarket() && sell.isLimit() )
             {
-                if ( topBuy.isLimit() )
+                if ( buy.isLimit() )
                 {
-                    price = topBuy.getPrice();
+                    price = buy.getPrice();
                 }
                 else
                 {
-                    price = topSell.getPrice();
+                    price = sell.getPrice();
                 }
             }
             
-            else if ( topBuy.isMarket() && topSell.isMarket() )
+            else if ( buy.isMarket() && sell.isMarket() )
             {
                 price = lastPrice;
             }
  
-            if ( topBuy.getShares() <= topSell.getShares() )
+            if ( buy.getShares() <= sell.getShares() )
             {
-                shares = topBuy.getShares();
+                shares = buy.getShares();
             }
             else
             {
-                shares = topSell.getShares();
+                shares = sell.getShares();
             }
  
-            topBuy.subtractShares( shares );
-            topSell.subtractShares( shares );
+            buy.subtractShares( shares );
+            sell.subtractShares( shares );
  
-            if ( topBuy.getShares() == 0 )
+            if ( buy.getShares() == 0 )
             {
                 buyOrders.remove();
             }
             
-            if ( topSell.getShares() == 0 )
+            if ( sell.getShares() == 0 )
             {
                 sellOrders.remove();
             }
@@ -117,12 +117,12 @@ public class Stock
  
             volume += shares;
  
-            topBuy.getTrader().receiveMessage( "You bought: " + shares + " "
-                + topBuy.getSymbol() + " at " + price + " amt " + shares
+            buy.getTrader().receiveMessage( "You bought: " + shares + " "
+                + buy.getSymbol() + " at " + price + " amt " + shares
                 * price );
  
-            topSell.getTrader().receiveMessage( "You sold: " + shares + " "
-                + topSell.getSymbol() + " at " + price + " amt " + shares
+            sell.getTrader().receiveMessage( "You sold: " + shares + " "
+                + sell.getSymbol() + " at " + price + " amt " + shares
                 * price );
  
         }
