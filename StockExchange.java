@@ -31,7 +31,7 @@ public class StockExchange
         double price )
     {
         Stock stock = new Stock(symbol, name, price);
-        listedStocks.put( name, stock );
+        listedStocks.put( symbol, stock );
 
     }
     public void placeOrder(TradeOrder order)
