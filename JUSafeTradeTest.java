@@ -434,12 +434,11 @@ public class JUSafeTradeTest
         StockExchange exchange = new StockExchange();
         exchange.listStock( "GGGL", "Giggle.com", 10.00 );
         Brokerage brokerage = new Brokerage( exchange );
+       
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "name", "password" ) == -1 );
+            brokerage.addUser( "nam", "password" ) == -1 );
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "name", "password" ) == -1 );
-        assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "username", "name" ) == -2 );
+            brokerage.addUser( "username", "n" ) == -2 );
         assertTrue( "<< Invalid name >>",
             brokerage.addUser( "username", "traderUsers" ) == -2 );
         assertTrue( "<< Invalid name >>",
