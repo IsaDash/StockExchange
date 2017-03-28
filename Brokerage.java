@@ -14,6 +14,10 @@ public class Brokerage implements Login
     private StockExchange exchange;
  
  
+    /**
+     * constructs new stock exchange
+     * @param exchange is a stock exchange
+     */
     public Brokerage( StockExchange exchange )
     {
         this.exchange = exchange;
@@ -25,9 +29,9 @@ public class Brokerage implements Login
     /**
      * Tries to register a new trader with a given screen name and password.
      * 
-     * @param name
-     * @param password
-     * @return int
+     * @param name is the trader name
+     * @param password is password trader
+     * @return int is the result when entered
      */
     public int addUser( String name, String password )
     {
@@ -52,8 +56,8 @@ public class Brokerage implements Login
      * Requests a quote for a given stock from the stock exachange and passes it
      * along to the trader by calling trader's receiveMessage method.
      * 
-     * @param symbol
-     * @param trader
+     * @param symbol is for getting a message
+     * @param trader is the receiver
      */
     public void getQuote( String symbol, Trader trader )
     {
@@ -62,6 +66,12 @@ public class Brokerage implements Login
     }
  
  
+    /** (non-Javadoc)
+     * @see Login#login(java.lang.String, java.lang.String)
+     * @param name is the trader name
+     * @param password is the trader password
+     * @return int is the result
+     */
     public int login( String name, String password )
     {
         if ( traders.get( name ) == null )
@@ -88,12 +98,20 @@ public class Brokerage implements Login
     }
  
  
+    /**
+     * Removes a specified trader from the set of logged-in traders.
+     * @param trader - the trader that logs out.
+     */
     public void logout( Trader trader )
     {
         loggedTraders.remove( trader );
     }
  
  
+    /**
+     * Places an order at the stock exchange. 
+     * @param order - an order to be placed at the stock exchange.
+     */
     public void placeOrder( TradeOrder order )
     {
         exchange.placeOrder( order );
@@ -103,18 +121,30 @@ public class Brokerage implements Login
     //
     // The following are for test purposes only
     //
+    /**
+     * map of traders
+     * @return the traders
+     */
     protected Map<String, Trader> getTraders()
     {
         return traders;
     }
  
  
+    /**
+     * set of traders
+     * @return trader set
+     */
     protected Set<Trader> getLoggedTraders()
     {
         return loggedTraders;
     }
  
  
+    /**
+     * stock exchange
+     * @return stock exchange
+     */
     protected StockExchange getExchange()
     {
         return exchange;
