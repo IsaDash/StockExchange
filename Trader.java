@@ -12,7 +12,7 @@ public class Trader implements Comparable<Trader>
     private Queue<String> mailbox;
 
     /**
-     * Constructs a new trader, affiliated with a given brokerage, with a given screen name and password. 
+     * Constructs a new trader, affiliated with a given brockerage, with a given screen name and password. 
      * @param broker  the brokerage for this trader.
      * @param name is username
      * @param pswd is password
@@ -22,6 +22,8 @@ public class Trader implements Comparable<Trader>
         brokerage = broker;
         screenName = name;
         password = pswd;
+        myWindow = null;
+        mailbox = new LinkedList<String>();
     }
     
     protected Queue<String> mailbox()
@@ -51,7 +53,7 @@ public class Trader implements Comparable<Trader>
      */
     public boolean equals(Object other)
     {
-        if (other instanceof Trader)
+        if (!(other instanceof Trader))
         {
             throw new ClassCastException();
         }
