@@ -386,7 +386,7 @@ public class JUSafeTradeTest
     
     // --Test Brokerage
     
-    @Test
+     @Test
     public void brokerageConstructor()
 
     {
@@ -422,18 +422,19 @@ public class JUSafeTradeTest
         exchange.listStock( "GGGL", "Giggle.com", 10.00 );
         Brokerage brokerage = new Brokerage( exchange );
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "name", "password" ) == -1 );
+            brokerage.addUser( "nam", "password" ) == -1 );
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "name", "password" ) == -1 );
+            brokerage.addUser( "userrrrrnam", "password" ) == -1 );
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "username", "name" ) == -2 );
+            brokerage.addUser( "username", "n" ) == -2 );
         assertTrue( "<< Invalid name >>",
             brokerage.addUser( "username", "traderUsers" ) == -2 );
         assertTrue( "<< Invalid name >>",
             brokerage.addUser( "username", "pswd" ) == 0
                 && brokerage.getTraders().containsKey( "username" ) );
+        
         assertTrue( "<< invalid name >>",
-            brokerage.addUser( "username", "pswd1" ) == -3 );
+            brokerage.addUser( "username", "pswd" ) == -3 );
 
     }
 
@@ -446,9 +447,10 @@ public class JUSafeTradeTest
         StockExchange exchange = new StockExchange();
         exchange.listStock( "GGGL", "Giggle.com", 10.00 );
         Brokerage brokerage = new Brokerage( exchange );
-        Trader trader = new Trader( brokerage, screenname, password );
-
-        brokerage.getQuote( symbol, trader );
+        Trader trader = new Trader( brokerage, "abcname", "abcpass" );
+        Stock stock = new Stock("abcd" , "abcname" , 5.0);
+        exchange.getListedStocks().put( "abcd", stock );
+        brokerage.getQuote( "abcd", trader );
         assertTrue( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
 
     }
@@ -465,20 +467,20 @@ public class JUSafeTradeTest
         String n = "java";
         String p = "trader";
         brokerage.addUser( n, p );
+        
         assertTrue( "<< Invalid brokerage login >>",
             brokerage.login( "user", p ) == -1 );
         assertTrue( "<< Invalid brokerage login >>",
             brokerage.login( n, "Invalid" ) == -2 );
-        assertTrue( "<< Invalid brokerage login >>",
-            brokerage.login( n, p ) == 0
-                && brokerage.getLoggedTraders()
-                    .contains( brokerage.getTraders().get( n ) )
-                && !brokerage.getTraders().get( n ).hasMessages() );
-
+        
         brokerage.login( n, p );
-
-        assertTrue( "<< invalid brokerage login >>",
+        assertTrue( "<< Invalid brokerage login >>",
             brokerage.login( n, p ) == -3 );
+        
+        brokerage.addUser( "name", "password" );
+        assertTrue( "<< Invalid brokerage login >>",
+            brokerage.login( "name", "password" ) == 0 );
+
 
     }
 
@@ -492,7 +494,7 @@ public class JUSafeTradeTest
         Brokerage brokerage = new Brokerage( exchange );
 
         brokerage.addUser( "java", "user" );
-        brokerage.login( "java", "user" );
+        
         brokerage.logout( brokerage.getTraders().get( "java" ) );
         assertFalse( "<< Invalid brokerage logout >>", brokerage.getLoggedTraders()
             .contains( brokerage.getTraders().get( "java" ) ) );
@@ -505,22 +507,17 @@ public class JUSafeTradeTest
 
     {
         StockExchange exchange = new StockExchange();
-        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
-        Brokerage brokerage = new Brokerage( exchange );
-        Trader trader = new Trader( brokerage, screenname, password );
+        Brokerage brokerage = new Brokerage(exchange);
+        Trader trader = new Trader(brokerage, "food", "abcpass");
+        TradeOrder order = new TradeOrder(trader, "food", true, true, 5, 10.0);
 
-        TradeOrder order = new TradeOrder( trader,
-            symbol,
-            true,
-            false,
-            10,
-            10.0 );
-        brokerage.placeOrder( order );
-        assertTrue( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
-        trader.openWindow();
-        brokerage.placeOrder( order );
-        assertFalse( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
+        Stock stock = new Stock("food", "abcname", 5.0);
+        exchange.getListedStocks().put("food", stock);
 
+        brokerage.placeOrder(order);
+
+        assertTrue("Brokerage: should have a message place",
+                trader.hasMessages());
     }
     
     // --Test StockExchange
@@ -601,7 +598,6 @@ public class JUSafeTradeTest
             trade.hasMessages() );
 
     }
-    
     
     // --Test Stock
     
