@@ -395,6 +395,15 @@ public class JUSafeTradeTest
         
     }
     
+    @Test
+    public void traderMailbox()
+    {
+        Trader trade = new Trader( brokerage, screenname, password);
+        trade.receiveMessage( "message" );
+        assertNotNull(trade.mailbox());
+    }
+    
+    
     // --Test Brokerage
     
     @Test
