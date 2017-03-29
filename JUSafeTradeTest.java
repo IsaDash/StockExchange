@@ -366,19 +366,14 @@ public class JUSafeTradeTest
     @Test
     public void traderPlaceOrder()
     {
-        StockExchange to = new StockExchange();
-        Brokerage safeTrade = new Brokerage( to );
-        safeTrade.addUser( "stockman", "sesame" );
-        Trader trade = new Trader( safeTrade, "stockman", "sesame" );
-        TradeOrder order = new TradeOrder( trade, symbol,buyOrder, marketOrder, numShares, price );
-        to.listStock( "GGGL", "Giggle.com", 10.00 );
-        trade.placeOrder( order );
-        assertTrue( "<< Invalid Trader placeOrder >>",
-            trade.hasMessages() );
-        trade.openWindow();
+        StockExchange sto = new StockExchange();
+        Brokerage bro = new Brokerage(sto);
+        Trader to = new Trader( bro, "testname", "testpass" );
+        TradeOrder order = new TradeOrder( to, "GGGL", true, true, 100, 100 );
+        sto.listStock( "GGGL", "testname", 100 );
         to.placeOrder( order );
-        assertFalse( "<< Invalid Trader placeOrder >>",
-            trade.hasMessages() );
+        assertTrue( "<< Trader: placeOrder failed >>",
+            to.hasMessages() );
     }
     
     @Test
@@ -400,9 +395,8 @@ public class JUSafeTradeTest
     {
         Trader trade = new Trader( brokerage, screenname, password);
         trade.receiveMessage( "message" );
-        assertNotNull(trade.mailbox());
+        assertTrue(trade.mailbox().contains( "message" ));
     }
-    
     
     // --Test Brokerage
     
@@ -434,11 +428,12 @@ public class JUSafeTradeTest
         StockExchange exchange = new StockExchange();
         exchange.listStock( "GGGL", "Giggle.com", 10.00 );
         Brokerage brokerage = new Brokerage( exchange );
-       
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "nam", "password" ) == -1 );
+            brokerage.addUser( "name", "password" ) == -1 );
         assertTrue( "<< Invalid name >>",
-            brokerage.addUser( "username", "n" ) == -2 );
+            brokerage.addUser( "name", "password" ) == -1 );
+        assertTrue( "<< Invalid name >>",
+            brokerage.addUser( "username", "name" ) == -2 );
         assertTrue( "<< Invalid name >>",
             brokerage.addUser( "username", "traderUsers" ) == -2 );
         assertTrue( "<< Invalid name >>",
@@ -508,25 +503,15 @@ public class JUSafeTradeTest
 
     @Test
     public void brokeragePlaceOrder()
-
     {
-        StockExchange exchange = new StockExchange();
-        exchange.listStock( "GGGL", "Giggle.com", 10.00 );
-        Brokerage brokerage = new Brokerage( exchange );
-        Trader trader = new Trader( brokerage, screenname, password );
-
-        TradeOrder order = new TradeOrder( trader,
-            symbol,
-            true,
-            false,
-            10,
-            10.0 );
-        brokerage.placeOrder( order );
-        assertTrue( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
-        trader.openWindow();
-        brokerage.placeOrder( order );
-        assertFalse( "<< Invalid Brokerage getQuote >>", trader.hasMessages() );
-
+        StockExchange sto = new StockExchange();
+        Brokerage bro = new Brokerage(sto);
+        Trader to = new Trader( bro, "testname", "testpass" );
+        TradeOrder order = new TradeOrder( to, "GGGL", true, true, 100, 100 );
+        sto.listStock( "GGGL", "testname", 100 );
+        bro.placeOrder( order );
+        assertTrue( "<< Brokerage: placeOrder failed >>",
+            to.hasMessages() );
     }
     
     // --Test StockExchange
@@ -552,14 +537,13 @@ public class JUSafeTradeTest
 
     }
 
-
     @Test
     public void stockExchangeListStock()
 
     {
         StockExchange se = new StockExchange();
         se.listStock( "GGGL", "Giggle.com", 10.0 );
-        Map<String, Stock> listedStocks = se.getListedStocks();
+        Map <String, Stock> listedStocks = se.getListedStocks();
         assertTrue( "<< Invalid StockExchange listStock >>",
             listedStocks.containsKey( "GGGL" ) );
     }
@@ -581,28 +565,14 @@ public class JUSafeTradeTest
 
     @Test
     public void stockExchangePlaceOrder()
-
     {
-        StockExchange to = new StockExchange();
-        Brokerage safeTrade = new Brokerage( to );
-        safeTrade.addUser( "stockman", "sesame" );
-        Trader trade = new Trader( safeTrade, "stockman", "sesame" );
-
-        TradeOrder order = new TradeOrder( trade,
-        symbol,
-        buyOrder,
-        marketOrder,
-        numShares,
-        price );
-
-        to.listStock( "GGGL", "Giggle.com", 10.00 );
-        to.placeOrder( order );
-        assertTrue( "<< Invalid StockExchange placeOrder >>",
-            trade.hasMessages() );
-        trade.openWindow();
-        to.placeOrder( order );
-        assertFalse( "<< Invalid StockExchange placeOrder >>",
-            trade.hasMessages() );
+        StockExchange sto = new StockExchange();
+        Trader to = new Trader( new Brokerage( new StockExchange() ), "testname", "testpass" );
+        TradeOrder order = new TradeOrder( to, "GGGL", true, true, 100, 100 );
+        sto.listStock( "GGGL", "testname", 100 );
+        sto.placeOrder( order);
+        assertTrue( "<< StockExchange: placeOrder failed >>",
+            to.hasMessages() );
     }
     
     
@@ -638,35 +608,11 @@ public class JUSafeTradeTest
     @Test
     public void stockPlaceOrder()
     {
-        String symbol = "SYMB";
-        String companyName ="Lynbrook Inc.";
-        double price = 135.75;
-        double bidPrice = price + 1;
-        Stock stock = new Stock(symbol, companyName, price);
-        
-        Trader trader1 = new Trader(null, "Lynb", "Viking");
-        
-        boolean buy = true;
-        boolean market = true;
-        int shares = 10;
-        TradeOrder order1 = new TradeOrder(trader1, symbol, buy, market, shares, 
-                                           bidPrice );
-        try
-        {
-            stock.placeOrder(order1);
-            
-            String quote = stock.getQuote();      
-            assertTrue("Stock quote contains invalid transaction information",
-                       quote.contains("Bid: " + bidPrice +  " size: " + shares));
-            //The above string concatenation needs match output of stock.getQuote()
-        }
-        catch (Exception e)
-        {
-            assertTrue("Failed to place an order", false);
-        }
-        
-        assertTrue("Trader should have received message after placing an order",
-                   trader1.hasMessages());
+        Stock s = new Stock( symbol, "name", price );
+        Trader to = new Trader( new Brokerage( new StockExchange() ), "testname", "testpass" );
+        s.placeOrder( new TradeOrder( to, "GGGL", true, true, 100, 100 ) );
+        assertTrue( "<< Stock: placeOrder failed >>",
+            to.hasMessages() );
     }
     
     @Test
