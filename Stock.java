@@ -172,22 +172,28 @@ public class Stock
      */
     public void placeOrder( TradeOrder order )
     {
-        String str = "New Order: ";
-
-        if (order.isBuy())
+        String bs;
+        if ( order.isBuy() )
         {
             buyOrders.add( order );
-            str += "Buy " + order.getSymbol() + " (" + companyName + ")" + "\n"
-                       + order.getShares() + " shares at " + order.getPrice();
+            bs = " Buy ";
         }
-        else if (order.isSell())
+        else
         {
             sellOrders.add( order );
-            str += "Sell " + order.getSymbol() + " (" + companyName + ") "
-                       + "\n" + order.getShares() + " shares at market";
+            bs = " Sell ";
         }
 
-        order.getTrader().receiveMessage( str );
+        String lm = "";
+        if ( order.isMarket() )
+            lm += "market";
+        else
+            lm += order.getPrice();
+
+        Trader trade = order.getTrader();
+        trade.receiveMessage( ( "New order: " + bs + stockSymbol + " ("
+            + companyName + ")\n" + order.getShares() + " shares at " + lm ) );
+
         executeOrders();
     }
     
