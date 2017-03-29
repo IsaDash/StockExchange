@@ -53,11 +53,8 @@ public class Trader implements Comparable<Trader>
      */
     public boolean equals(Object other)
     {
-        if (!(other instanceof Trader))
-        {
-            throw new ClassCastException();
-        }
-        return screenName.toLowerCase().equals(((Trader)other).screenName);
+        
+        return compareTo( (Trader)other ) == 0;
     }
     
     /**
